@@ -1,0 +1,63 @@
+
+--	tb_group
+
+
+CREATE TABLE `tb_group` (
+  `gid` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '主键,以群号为值',
+  `group_name` varchar(20) CHARACTER SET utf8 NOT NULL COMMENT '群名字',
+  PRIMARY KEY (`gid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+-- 	tb_user
+
+
+CREATE TABLE `tb_user` (
+  `uid` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '主键,以QQ号码为值',
+  `pwd` varchar(20) CHARACTER SET utf8 NOT NULL COMMENT '生成6位随机数作为pwd',
+  `nick_name` varchar(40) CHARACTER SET utf8 NOT NULL COMMENT '用户昵称',
+  `credits` int(11) NOT NULL DEFAULT '10' COMMENT '默认送10积分',
+  `gid` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '外键,所属群',
+  `is_freashman` bit(1) NOT NULL DEFAULT b'1' COMMENT '是否第一次发信,默认值: 1',
+  `is_UserValid` bit(1) NOT NULL DEFAULT b'1' COMMENT '账号是否有效:',
+  PRIMARY KEY (`uid`),
+  KEY `fk_user_group` (`gid`),
+  CONSTRAINT `fk_user_group` FOREIGN KEY (`gid`) REFERENCES `tb_group` (`gid`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+--	tb_quest
+
+
+CREATE TABLE `tb_quest` (
+  `qid` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键(自增),问题ID',
+  `from_uid` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '外键,提问者ID',
+  `quest_content` varchar(255) CHARACTER SET utf8 NOT NULL COMMENT '问题内容',
+  `is_QuestValid` bit(1) NOT NULL DEFAULT b'1' COMMENT '0-无效;默认为1-有效',
+  `Post_date` datetime NOT NULL,
+  PRIMARY KEY (`qid`),
+  KEY `fk_quest_user` (`from_uid`),
+  CONSTRAINT `fk_quest_user` FOREIGN KEY (`from_uid`) REFERENCES `tb_user` (`uid`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+
+--	tb_ans
+
+CREATE TABLE `tb_ans` (
+  `aid` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键(自增),答案ID',
+  `qid` int(11) NOT NULL COMMENT '外键,当前被答问题的ID',
+  `uid` varchar(10) CHARACTER SET utf8 NOT NULL COMMENT '外键,回答问题的用户的QQ号码',
+  `Ans_content` varchar(255) CHARACTER SET utf8 NOT NULL COMMENT '答案内容',
+  `ans_date` datetime NOT NULL COMMENT '回答时间',
+  `Is_accepted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否采纳,默认为0-未采纳',
+  PRIMARY KEY (`aid`),
+  KEY `fk_ans_quest` (`qid`),
+  KEY `fk_ans_user` (`uid`),
+  CONSTRAINT `fk_ans_quest` FOREIGN KEY (`qid`) REFERENCES `tb_quest` (`qid`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_ans_user` FOREIGN KEY (`uid`) REFERENCES `tb_user` (`uid`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
